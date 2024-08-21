@@ -25,7 +25,7 @@ def main():
             'noplaylist': True,
             # "cookiefile": os.path.join(os.getcwd(), cookieFileName),
             "cookiefile": cookieFileName,
-            "proxy": os.getenv("PROXY", "https://38.154.227.167"),
+            "proxy": os.getenv("PROXY", "socks5://212.83.137.30:49359"),
             "nocheckcertificate": True
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
