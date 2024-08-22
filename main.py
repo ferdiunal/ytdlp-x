@@ -25,7 +25,7 @@ def main():
             'noplaylist': True,
             # "cookiefile": os.path.join(os.getcwd(), cookieFileName),
             "cookiefile": cookieFileName,
-            "proxy": os.getenv("PROXY", "http://ztaijadv:a13qe39b7nm7@38.154.227.167:5868"),
+            # "proxy": os.getenv("PROXY", "http://ztaijadv:a13qe39b7nm7@38.154.227.167:5868"),
             "nocheckcertificate": True,
             "http_headers": {
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
