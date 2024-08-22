@@ -92,12 +92,54 @@ def extract_tiktok_info(info_dict):
 
 def extract_instagram_info(info_dict):
     print('extract_instagram_info')
-    mp4_formats = [
+    hostname = request.host
+    scheme = request.scheme
+
+    video_formats = [
         fmt for fmt in info_dict.get('formats', [])
-        if fmt.get('width') is not None and fmt.get("width") >= 540 and not str(fmt.get("format")).startswith("dash-")
+        if fmt.get('vcodec') != 'none' and fmt.get('acodec') == 'none'
     ]
-    mp4_formats.sort(key=lambda x: x.get('width'), reverse=True)
-    return mp4_formats[0]["url"] if mp4_formats else None
+    audio_formats = [
+        fmt for fmt in info_dict.get('formats', [])
+        if fmt.get('acodec') != 'none' and fmt.get('vcodec') == 'none'
+    ]
+
+    video_formats.sort(key=lambda x: x.get('height') or 0, reverse=True)
+    audio_formats.sort(key=lambda x: x.get('abr') or 0, reverse=True)
+
+    if not video_formats or not audio_formats:
+        raise ValueError("No suitable video or audio format found")
+
+    best_video = video_formats[0]
+    best_audio = audio_formats[0]
+
+    video_id = str(info_dict['id'])
+    output_path = os.path.join(OUTPUT_DIR, f'{video_id}.mp4')
+
+    ydl_opts = {
+        'format': f"{best_video['format_id']}+{best_audio['format_id']}",
+        'outtmpl': {'default': os.path.join(OUTPUT_DIR + '/tmp', f'{video_id}.%(ext)s')},
+        'merge_output_format': 'mp4',
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        error_code = ydl.download([info_dict['webpage_url']])
+        if error_code != 0:
+            raise ValueError(f"Failed to download video. Error code: {error_code}")
+
+    merged_file = os.path.join(OUTPUT_DIR + '/tmp', f'{video_id}.mp4')
+    
+    if not os.path.exists(merged_file):
+        raise FileNotFoundError(f"Merged video file not found: {merged_file}")
+
+    os.rename(merged_file, output_path)
+
+    url_safe_video_id = base64.urlsafe_b64encode(video_id.encode()).decode().rstrip('=')
+
+    return {
+        'title': info_dict.get('title'),
+        'video_id': f"{scheme}://{hostname}/stream/{url_safe_video_id}",
+    }
 
 def extract_video_info(url, cookieFileName):
     ydl_opts = {

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yt-dlp-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: yt-dlp-api
+  template:
+    metadata:
+      labels:
+        app: yt-dlp-api
+    spec:
+      containers:
+        - name: yt-dlp-api
+          image: debiansys/yt-dlp-api:latest
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: cookies
+              mountPath: /app/cookies
+            - name: output
+              mountPath: /app/output
+      volumes:
+        - name: cookies
+          emptyDir: {}
+        - name: output
+          emptyDir: {}
+      imagePullSecrets:
+        - name: dockerhub
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yt-dlp-api-service
+spec:
+  selector:
+    app: yt-dlp-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: LoadBalancer
