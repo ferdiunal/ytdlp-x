@@ -42,7 +42,7 @@ def main():
             mp4_formats.sort(key=lambda x: x.get('width'), reverse=True)
 
             return {
-                'caption': info_dict.get('description'),
+                'caption': info_dict.get('description') or info_dict.get('title'),
                 'url': mp4_formats[0]["url"]
             }
     except Exception as e:
