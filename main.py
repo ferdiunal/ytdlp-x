@@ -20,6 +20,7 @@ def main():
         elif(str(request.args.get('url')).startswith("https://www.instagram.com")):
             cookieFileName = "instagram.cookies.txt"
         url = request.args.get('url')
+        print(os.path.join(os.getcwd(), cookieFileName))
         ydl_opts = {
             "format": "best",
             'noplaylist': True,
