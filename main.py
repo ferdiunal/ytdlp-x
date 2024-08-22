@@ -24,6 +24,8 @@ def main():
         ydl_opts = {
             "format": "best",
             'noplaylist': True,
+            "username": os.getenv("USERNAME"),
+            "password": os.getenv("PASSWORD"),
             "cookiefile": os.path.join(os.getcwd(), cookieFileName),
             # "cookiefile": cookieFileName,
             # "proxy": os.getenv("PROXY", "http://ztaijadv:a13qe39b7nm7@38.154.227.167:5868"),
