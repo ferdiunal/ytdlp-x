@@ -1,5 +1,5 @@
 # Use an official Python runtime as the base image
-FROM python:3.9-alpine
+FROM --platform=$BUILDPLATFORM python:3.9-alpine
 
 RUN apk add --no-cache ffmpeg
 
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . /app
 
 # Create a directory for cookies
-RUN mkdir -p /app/cookies
+RUN mkdir -p /app/cookies && mkdir -p /app/output
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
