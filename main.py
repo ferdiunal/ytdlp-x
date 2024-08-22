@@ -14,17 +14,17 @@ def main():
         abort(500)
 
     try:
-        cookieFileName = "/tmp/youtube.cookies.txt"
+        cookieFileName = "youtube.cookies.txt"
         if(str(request.args.get('url')).startswith("https://www.tiktok.com/@")):
-            cookieFileName = "/tmp/tiktok.cookies.txt"
+            cookieFileName = "tiktok.cookies.txt"
         elif(str(request.args.get('url')).startswith("https://www.instagram.com")):
-            cookieFileName = "/tmp/instagram.cookies.txt"
+            cookieFileName = "instagram.cookies.txt"
         url = request.args.get('url')
         ydl_opts = {
             "format": "best",
             'noplaylist': True,
-            # "cookiefile": os.path.join(os.getcwd(), cookieFileName),
-            "cookiefile": cookieFileName,
+            "cookiefile": os.path.join(os.getcwd(), cookieFileName),
+            # "cookiefile": cookieFileName,
             # "proxy": os.getenv("PROXY", "http://ztaijadv:a13qe39b7nm7@38.154.227.167:5868"),
             "nocheckcertificate": True,
             "http_headers": {
