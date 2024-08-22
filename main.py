@@ -36,7 +36,11 @@ def main():
             info_dict = ydl.extract_info(url, download=False)
             mp4_formats = [
                 fmt for fmt in info_dict.get('formats', [])
-                if(str(url).startswith("https://www.tiktok.com/@") and fmt.get('cookies') is None and fmt.get("width") >= 720 or str(url).startswith("https://www.youtube.com") and fmt.get('ext') == 'mp4' and fmt.get('protocol') == 'https' and fmt.get('width') >= 720 or str(url).startswith("https://www.instagram.com") and fmt.get('width') is not None and fmt.get("width") >= 540 and str(fmt.get("format")).startswith("dash-") is False)
+                if (
+                    (str(url).startswith("https://www.tiktok.com/@") and fmt.get('cookies') is None and fmt.get("width") >= 720) or
+                    (str(url).startswith("https://www.youtube.com") and fmt.get('ext') == 'mp4' and fmt.get('protocol') == 'https' and fmt.get('width') >= 720) or
+                    (str(url).startswith("https://www.instagram.com") and fmt.get('width') is not None and fmt.get("width") >= 540 and not str(fmt.get("format")).startswith("dash-"))
+                )
             ]
 
             mp4_formats.sort(key=lambda x: x.get('width'), reverse=True)
