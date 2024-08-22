@@ -51,6 +51,7 @@ def downloadAndStream(alias:str, cookieFileName:str):
         'merge_output_format': 'mp4',
         "cookiefile": os.path.join(os.getcwd(), cookieFileName),
         "nocheckcertificate": True,
+        "ffmpeg_location": "/usr/bin/ffmpeg",
         "http_headers": {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
         }
