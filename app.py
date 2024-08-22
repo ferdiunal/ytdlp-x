@@ -10,11 +10,13 @@ app = Flask(__name__)
 
 OUTPUT_DIR = 'output'
 
+# Klasörü oluştur
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
-if not os.path.exists(OUTPUT_DIR + '/tmp'):
-    os.makedirs(OUTPUT_DIR + '/tmp')
+# 'tmp' alt klasörünü oluştur
+if not os.path.exists(os.path.join(OUTPUT_DIR, 'tmp')):
+    os.makedirs(os.path.join(OUTPUT_DIR, 'tmp'))
 
 def extract_youtube_info(info_dict):
     hostname = request.host
