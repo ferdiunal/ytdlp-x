@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 @app.route("/s/<video_id>", methods=["GET"])
 def stream(video_id):
-    if not request.headers.get("authorization") or not request.args.get('url'):
+    if not request.headers.get("authorization"):
         abort(500)
     token = str(request.headers.get("authorization")).split("Bearer ")[1]
     if token != os.getenv("AUTHORIZATION"):
