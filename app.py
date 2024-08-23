@@ -30,6 +30,8 @@ def stream(video_id):
 
 @app.route("/", methods=["GET"])
 def main():
+    if not request.headers.get("authorization") or not request.args.get('url'):
+        abort(500)
     token = str(request.headers.get("authorization")).split("Bearer ")[1]
     if token != os.getenv("AUTHORIZATION"):
         abort(500)
