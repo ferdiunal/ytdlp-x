@@ -22,13 +22,7 @@ def is_url(target: str):
 app = Flask(__name__)
 
 @app.route("/s/<video_id>", methods=["GET"])
-def stream(video_id):
-    if not request.headers.get("authorization"):
-        abort(500)
-    token = str(request.headers.get("authorization")).split("Bearer ")[1]
-    if token != os.getenv("AUTHORIZATION"):
-        abort(500)
-    
+def stream(video_id):    
     video_id = base64.urlsafe_b64decode(video_id + "==").decode()
     video_path = os.path.join(OUTPUT_DIR, f'{video_id}.mp4')
     if not os.path.exists(video_path):
@@ -37,11 +31,11 @@ def stream(video_id):
 
 @app.route("/", methods=["GET"])
 def main():
-    if not request.headers.get("authorization") or not request.args.get('url'):
-        abort(500)
-    token = str(request.headers.get("authorization")).split("Bearer ")[1]
-    if token != os.getenv("AUTHORIZATION"):
-        abort(500)
+    # if not request.headers.get("authorization") or not request.args.get('url'):
+    #     abort(500)
+    # token = str(request.headers.get("authorization")).split("Bearer ")[1]
+    # if token != os.getenv("AUTHORIZATION"):
+    #     abort(500)
 
     if is_url('youtube.com'):
         return downloadAndStream("yt", "youtube.cookies.txt")
