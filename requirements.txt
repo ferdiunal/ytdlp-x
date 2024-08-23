@@ -1,4 +1,4 @@
 Flask
 gunicorn
 yt-dlp
-moviepy
+yt-dlp-youtube-oauth2 @ https://github.com/coletdjnz/yt-dlp-youtube-oauth2/archive/refs/heads/master.zip#sha256=5106a29ed1025873ce2e7b3655df7958b6d2a6bd59754105bd27a3d2c5618131

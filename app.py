@@ -1,9 +1,11 @@
-from flask import Flask
-from flask import request, abort, send_file
+from flask import Flask, request, abort, send_file
 from urllib.parse import urlparse
+from dotenv import load_dotenv
 import os
 import yt_dlp
 import base64
+
+load_dotenv()
 
 OUTPUT_DIR = 'output'
 if not os.path.exists(OUTPUT_DIR):
@@ -28,7 +30,8 @@ def stream(video_id):
 
 @app.route("/", methods=["GET"])
 def main():
-    if request.headers.get("authorization") != os.getenv("AUTHORIZATION"):
+    token = str(request.headers.get("authorization")).split("Bearer ")[1]
+    if token != os.getenv("AUTHORIZATION"):
         abort(500)
 
     if is_url('youtube.com'):
@@ -40,7 +43,7 @@ def main():
     if is_url('tiktok.com'):
         return downloadAndStream("tt", "tiktok.cookies.txt")
 
-def downloadAndStream(alias:str, cookieFileName:str):
+def downloadAndStream(alias: str, cookieFileName: str):
     url = request.args.get('url')
     scheme = request.scheme
     hostname = request.host
@@ -49,13 +52,18 @@ def downloadAndStream(alias:str, cookieFileName:str):
         "format": "bestvideo+bestaudio/best",
         'noplaylist': True,
         'merge_output_format': 'mp4',
-        "cookiefile": os.path.join(os.getcwd(), cookieFileName),
         "nocheckcertificate": True,
-        "ffmpeg_location": "/usr/bin/ffmpeg",
+        "ffmpeg_location": os.getenv("FFMPEG_PATH"),
         "http_headers": {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
-        }
+            "User-Agent": os.getenv("USER_AGENT"),
+        },
     }
+
+    if alias == "yt":
+        ydl_opts["username"] = "oauth2"
+    else:
+        ydl_opts["cookiefile"] =  os.path.join(os.getcwd(), cookieFileName),
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(url, download=False)
         video_id = f"{alias}-{info_dict.get('id')}"
