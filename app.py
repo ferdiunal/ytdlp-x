@@ -57,6 +57,8 @@ def downloadAndStream(alias:str, cookieFileName:str):
         'merge_output_format': 'mp4',
         # "cookiefile": os.path.join(os.getcwd(), cookieFileName),
         "nocheckcertificate": True,
+        "usenetrc": True,
+        # "netrc_location": ""
         "ffmpeg_location": os.getenv("FFMPEG_PATH"),
         "http_headers": {
             "User-Agent": os.getenv("USER_AGENT"),
