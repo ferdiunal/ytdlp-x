@@ -1,3 +1,43 @@
+apiVersion: v1 # Değişiklik burada
+kind: PersistentVolume
+metadata:
+  name: ebs-gp3-volume
+spec:
+  capacity:
+    storage: 50Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: gp3
+  awsElasticBlockStore: # EBS volume türünü belirtiyoruz
+    fsType: ext4
+
+---
+apiVersion: v1 # Bu zaten doğruydu
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-gp3-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: yt-dlp-netrc-secret
+type: Opaque
+stringData:
+  .netrc: |
+    machine youtube login myaccount@gmail.com password my_youtube_password
+    machine twitch login my_twitch_account_name password my_twitch_password
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,15 +58,29 @@ spec:
           ports:
             - containerPort: 8000
           volumeMounts:
-            - name: cookies
+            - name: ebs-volume
               mountPath: /app/cookies
-            - name: output
+              subPath: cookies
+            - name: ebs-volume
               mountPath: /app/output
+              subPath: output
+            - name: ebs-volume
+              mountPath: /root/.cache/yt-dlp
+              subPath: yt-dlp-cache
+            - name: netrc-volume
+              mountPath: /root/.netrc
+              subPath: .netrc
       volumes:
-        - name: cookies
-          emptyDir: {}
-        - name: output
-          emptyDir: {}
+        - name: ebs-volume
+          persistentVolumeClaim:
+            claimName: ebs-gp3-claim
+        - name: netrc-volume
+          secret:
+            secretName: yt-dlp-netrc-secret
+            items:
+              - key: .netrc
+                path: .netrc
+            defaultMode: 0600 # Dosya izinlerini sınırlandırır
       imagePullSecrets:
         - name: dockerhub
 
