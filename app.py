@@ -64,7 +64,7 @@ def downloadAndStream(alias:str, cookieFileName:str):
     }
     
     if alias != 'yt':
-        ydl_opts["cookiefile"] = os.path.join(os.getcwd(), cookieFileName)
+        ydl_opts["cookiefile"] = os.path.join(os.getcwd(), "cookies", cookieFileName)
     else:
         ydl_opts["username"] = "oauth2"
 
