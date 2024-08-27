@@ -21,21 +21,44 @@ def is_url(target: str):
 
 app = Flask(__name__)
 
-@app.route("/s/<video_id>", methods=["GET"])
-def stream(video_id):    
+@app.route("/s/<video_id>", methods=["GET", "HEAD"])
+def stream(video_id):
+    if request.method == "GET":
+        if not request.headers.get("authorization"):
+            abort(500)
+        token = str(request.headers.get("authorization")).split("Bearer ")[1]
+        if token != os.getenv("AUTHORIZATION"):
+            abort(500)
+
     video_id = base64.urlsafe_b64decode(video_id + "==").decode()
     video_path = os.path.join(OUTPUT_DIR, f'{video_id}.mp4')
     if not os.path.exists(video_path):
         abort(404)
     return send_file(video_path)
 
+@app.route("/s/<video_id>", methods=["DELETE"])
+def deleteFile(video_id):
+    if not request.headers.get("authorization"):
+        abort(500)
+    token = str(request.headers.get("authorization")).split("Bearer ")[1]
+    if token != os.getenv("AUTHORIZATION"):
+        abort(500)
+        
+    video_id = base64.urlsafe_b64decode(video_id + "==").decode()
+    video_path = os.path.join(OUTPUT_DIR, f'{video_id}.mp4')
+    if not os.path.exists(video_path):
+        abort(404)
+    os.remove(video_path)
+    return ('', 204)
+
 @app.route("/", methods=["GET"])
 def main():
-    # if not request.headers.get("authorization") or not request.args.get('url'):
-    #     abort(500)
-    # token = str(request.headers.get("authorization")).split("Bearer ")[1]
-    # if token != os.getenv("AUTHORIZATION"):
-    #     abort(500)
+    print([request.headers.get("authorization"), request.args.get('url'),  os.getenv("AUTHORIZATION")])
+    if not request.headers.get("authorization") or not request.args.get('url'):
+        abort(500)
+    token = str(request.headers.get("authorization")).split("Bearer ")[1]
+    if token != os.getenv("AUTHORIZATION"):
+        abort(500)
 
     if is_url('youtube.com'):
         return downloadAndStream("yt", "youtube.cookies.txt")
@@ -57,7 +80,7 @@ def downloadAndStream(alias:str, cookieFileName:str):
         'merge_output_format': 'mp4',
         # "cookiefile": os.path.join(os.getcwd(), cookieFileName),
         "nocheckcertificate": True,
-        "usenetrc": True,
+        # "usenetrc": True,
         # "netrc_location": ""
         "ffmpeg_location": os.getenv("FFMPEG_PATH"),
         "http_headers": {
@@ -66,7 +89,8 @@ def downloadAndStream(alias:str, cookieFileName:str):
     }
     
     if alias != 'yt':
-        ydl_opts["cookiefile"] = os.path.join(os.getcwd(), "cookies", cookieFileName)
+        ydl_opts["usenetrc"] = True
+        # ydl_opts["cookiefile"] = os.path.join(os.getcwd(), "cookies", cookieFileName)
     else:
         ydl_opts["username"] = "oauth2"
 
