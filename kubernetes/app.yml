@@ -57,6 +57,12 @@ spec:
           image: debiansys/yt-dlp-api:latest
           ports:
             - containerPort: 8000
+          env:
+            - name: AUTHORIZATION
+              valueFrom:
+                secretKeyRef:
+                  name: yt-dlp-netrc-secret
+                  key: AUTHORIZATION
           volumeMounts:
             - name: ebs-volume
               mountPath: /app/cookies
